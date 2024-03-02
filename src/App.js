@@ -7,11 +7,25 @@ const mockData = () => Array.from(Array(totalRecords).keys()).map(x => ({
   a: x, b: "alsdfjasldf", c: "asldfjsdfjk"
 }));
 
+// size of each table row
 const rowHeight = 20;
+
+// size of the visible portion of the table
 const pageSize = 1000;
+
+// number of row to increment on next page
+const incrementSize = 1;
+
+// amount to grow or shrink buffers 
+const incrementBufferSize = rowHeight * incrementSize; 
+
+const initialEndBufferSize = (totalRecords * rowHeight) - pageSize;
 
 const getSizeFromPixel = (str) => Number(str.substring(0, str.length - 2));
 
+/**
+ * Scroll top to window
+ */
 
 function App() {
   const [data, setData] = useState([]);
@@ -34,44 +48,64 @@ function App() {
     ref.current.style.height = `${height}px`;
   }
 
+  const scrollTableIntoView = () => {
+    document.getElementById("tid").scrollIntoView();
+  }
+
   const onClickLeft = () => {
     if (windowLeft === 0) {
       return;
     }
 
-    const updateWindowLeft = windowLeft - 50;
-    const updateWindowRight = windowRight - 50;
+    const updateWindowLeft = windowLeft - incrementSize;
+    const updateWindowRight = windowRight - incrementSize;
 
     setWindowLeft(updateWindowLeft);
     setWindowRight(updateWindowRight);
 
     setData(allData.current.slice(updateWindowLeft, updateWindowRight));
 
-    incrementBuffer(startBuffer, - 1000);
-    incrementBuffer(endBuffer, 1000);
+    incrementBuffer(startBuffer, -incrementBufferSize);
+    incrementBuffer(endBuffer, incrementBufferSize);
 
+    scrollTableIntoView();
   }
   const onClickRight = () => {
     if (windowRight === totalRecords) {
       return;
     }
 
-    const updateWindowLeft = windowLeft + 50;
-    const updateWindowRight = windowRight + 50;
+    const updateWindowLeft = windowLeft + incrementSize;
+    const updateWindowRight = windowRight + incrementSize;
 
     setWindowLeft(updateWindowLeft);
     setWindowRight(updateWindowRight);
 
     setData(allData.current.slice(updateWindowLeft, updateWindowRight));
 
-    incrementBuffer(startBuffer, 1000);
-    incrementBuffer(endBuffer, -1000);
+    incrementBuffer(startBuffer, incrementBufferSize);
+    incrementBuffer(endBuffer, -incrementBufferSize);
+
+    scrollTableIntoView();
   }
 
   useEffect(() => {
     setData(allData.current.slice(0, windowRight));
+    // set initial buffer heights
     startBuffer.current.style.height = "0px";
-    endBuffer.current.style.height = "19000px";
+    endBuffer.current.style.height = `${initialEndBufferSize}px`;
+  }, []);
+
+  useEffect(() => {
+    const container = document.getElementById("super-special-id");
+
+    const handler = (event) => {
+      console.log(container.scrollTop);
+
+      //scrollTableIntoView();
+    }
+
+    container.addEventListener("scrollend", handler);
   }, []);
   
   const onChecked = (id) => {
@@ -88,7 +122,7 @@ function App() {
       <button onClick={onClickRight}>Right</button>
       <div className='App-Inner' id="super-special-id">
       <div ref={startBuffer}/>
-      <table>
+      <table id="tid">
         <tbody>
         {
           data.map(({a, b, c}) => 

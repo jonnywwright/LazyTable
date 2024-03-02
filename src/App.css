@@ -2,7 +2,7 @@
   position: absolute;
 }
 body {
-  background: cornflowerblue;
+  background: #001d66;
 }
 
 table {
@@ -14,10 +14,11 @@ tbody, table, tr, td {
   padding: 0px;
   font-size: 14px;
   box-sizing: border-box;
+
  }
 
  td {
-  background-color: aliceblue;
+  background-color: #adc6ff;
   padding-left: 24px;
   padding-right: 24px;
   margin: 0px;
