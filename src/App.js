@@ -3,60 +3,77 @@ import './App.css';
 import { useEffect, useState, useRef } from "react";
 
 const totalRecords = 1000;
-const totalHeight = (22 * totalRecords) + 1; // header is a row
 const mockData = () => Array.from(Array(totalRecords).keys()).map(x => ({
   a: x, b: "alsdfjasldf", c: "asldfjsdfjk"
 }));
 
-const rowHeight = 22;
+const rowHeight = 20;
+const pageSize = 1000;
+
+const getSizeFromPixel = (str) => Number(str.substring(0, str.length - 2));
+
 
 function App() {
   const [data, setData] = useState([]);
   const [checkedIds, setCheckedIds] = useState([]);
   const allData = useRef(mockData().map(x => x));
-  let windowStart = 0;
-  let windowEnd = 100;
-  let startBufferHeight = 0;
-  let endBufferHeight = rowHeight * 1000;
   const startBuffer = useRef(null);
   const endBuffer = useRef(null);
 
-  
+  const [windowLeft, setWindowLeft] = useState(0);
+  const [windowRight, setWindowRight] = useState(50);
+
+  const incrementBuffer = (ref, count) => {
+    const pixelHeight = ref.current.style.height;
+    
+    console.log({pixelHeight})
+    let height = getSizeFromPixel(pixelHeight);
+
+    height += count;
+
+    ref.current.style.height = `${height}px`;
+  }
+
+  const onClickLeft = () => {
+    if (windowLeft === 0) {
+      return;
+    }
+
+    const updateWindowLeft = windowLeft - 50;
+    const updateWindowRight = windowRight - 50;
+
+    setWindowLeft(updateWindowLeft);
+    setWindowRight(updateWindowRight);
+
+    setData(allData.current.slice(updateWindowLeft, updateWindowRight));
+
+    incrementBuffer(startBuffer, - 1000);
+    incrementBuffer(endBuffer, 1000);
+
+  }
+  const onClickRight = () => {
+    if (windowRight === totalRecords) {
+      return;
+    }
+
+    const updateWindowLeft = windowLeft + 50;
+    const updateWindowRight = windowRight + 50;
+
+    setWindowLeft(updateWindowLeft);
+    setWindowRight(updateWindowRight);
+
+    setData(allData.current.slice(updateWindowLeft, updateWindowRight));
+
+    incrementBuffer(startBuffer, 1000);
+    incrementBuffer(endBuffer, -1000);
+  }
+
   useEffect(() => {
-    // load first 100
-
-    startBuffer.current.style.height = `${startBufferHeight}` 
-    endBuffer.current.style.height = `${endBufferHeight}px`
-
-    setData(allData.current.slice(windowStart, windowEnd));
-
-    // document.getElementById("super-special-id")?.addEventListener("scroll", (event) => {
-    //   console.log(event);
-
-    // });
-    
-    const superSpecialDiv = document.getElementById("super-special-id");
-    
-    const more = (event) => {
-      console.log("scroll end", event);
-      const scrollHeight = superSpecialDiv.scrollHeight;
-      const scrollTop = superSpecialDiv.scrollTop;
-      const clientHeight = superSpecialDiv.clientHeight;
-      
-      console.log(scrollHeight, scrollTop, clientHeight)
-      setData(allData.current.slice(windowStart, windowEnd));
-
-      windowStart += 75;
-      windowEnd += 75;
-    }
-   
-    superSpecialDiv?.addEventListener("scrollend", more);
-
-    return () => {
-      document.removeEventListener("scrollend", more); 
-    }
-  }, [])
-
+    setData(allData.current.slice(0, windowRight));
+    startBuffer.current.style.height = "0px";
+    endBuffer.current.style.height = "19000px";
+  }, []);
+  
   const onChecked = (id) => {
     if (checkedIds.includes(id)) {
       setCheckedIds(prev => prev.filter(x => x !== id));
@@ -67,22 +84,16 @@ function App() {
 
   return (
     <div className="App">
+      <button onClick={onClickLeft}>Left</button>
+      <button onClick={onClickRight}>Right</button>
       <div className='App-Inner' id="super-special-id">
       <div ref={startBuffer}/>
       <table>
-        <thead>
-        <tr>
-          <th>Selected</th>
-          <th>Company</th>
-          <th>Contact</th>
-          <th>Country</th>
-        </tr>
-        </thead>
         <tbody>
         {
           data.map(({a, b, c}) => 
             <tr key={a.toString()}>
-              <td><input type="checkbox" onClick={() => onChecked(a)}/></td>
+              <td><input type="checkbox" checked={checkedIds.includes(a)} onClick={() => onChecked(a)}/></td>
               <td>{a}</td>
               <td>{b}</td>
               <td>{c}</td>

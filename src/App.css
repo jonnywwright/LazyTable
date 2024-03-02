@@ -1,11 +1,29 @@
 .App {
   position: absolute;
 }
+body {
+  background: cornflowerblue;
+}
+
+table {
+  border-collapse: collapse;
+}
+
 tbody, table, tr, td {
   margin: 0px;
   padding: 0px;
-}
+  font-size: 14px;
+  box-sizing: border-box;
+ }
+
+ td {
+  background-color: aliceblue;
+  padding-left: 24px;
+  padding-right: 24px;
+  margin: 0px;
+ }
 .App-Inner {
   overflow: auto;
-  height: 1188px;
+  height: 1000px;
+  background: #d4d4d4;
 }
