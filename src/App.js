@@ -106,6 +106,8 @@ function App() {
       const l = c;
       const r = c + recordsPerPage;
       
+      setWindowLeft(l);
+      setWindowRight(r);
       setData(allData.current.slice(l, r));
 
       // get the frontBuffer height and set it
