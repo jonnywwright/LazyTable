@@ -1,8 +1,7 @@
-import logo from './logo.svg';
 import './App.css';
 import { useEffect, useState, useRef } from "react";
 
-const totalRecords = 1000;
+const totalRecords = 500000;
 const mockData = () => Array.from(Array(totalRecords).keys()).map(x => ({
   a: x, b: "alsdfjasldf", c: "asldfjsdfjk"
 }));
@@ -12,6 +11,9 @@ const rowHeight = 20;
 
 // size of the visible portion of the table
 const pageSize = 1000;
+
+// records per page
+const recordsPerPage = pageSize / rowHeight;
 
 // number of row to increment on next page
 const incrementSize = 1;
@@ -100,9 +102,30 @@ function App() {
     const container = document.getElementById("super-special-id");
 
     const handler = (event) => {
-      console.log(container.scrollTop);
+      const st = container.scrollTop;
+      const c = Math.round(st/rowHeight);
+      // print scroll top
+      console.log(container.scrollTop, { c });
+      
+      // set the correct data
+      const l = c;
+      const r = c + recordsPerPage;
+      
+      setData(allData.current.slice(l, r));
 
-      //scrollTableIntoView();
+      // get the frontBuffer height and set it
+      const fBufferHeight = c * rowHeight;
+
+      startBuffer.current.style.height = `${fBufferHeight}px`;
+
+      const eBufferHeight = initialEndBufferSize - fBufferHeight;
+
+      endBuffer.current.style.height = `${eBufferHeight}px`
+
+      // get the back buffer height and set it
+
+      // scroll into view
+     scrollTableIntoView();
     }
 
     container.addEventListener("scrollend", handler);
