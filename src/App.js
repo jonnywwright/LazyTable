@@ -37,8 +37,6 @@ function App() {
     const eBufferHeight = initialEndBufferSize - fBufferHeight;
 
     endBuffer.current.style.height = `${eBufferHeight}px`
-
-    document.getElementById("tid").scrollIntoView();
   }, [windowLeft])
 
   // Used for debugging;
@@ -78,10 +76,16 @@ function App() {
       setData(allData.current.slice(left, left + recordsPerPage));
     }
 
-    tableContainer.current.addEventListener("scrollend", handler);
+    tableContainer.current.style.height = `${pageSize}px`;
+
+    tableContainer.current.addEventListener("scroll", handler);
 
     // Set the initial data.
     setData(allData.current.slice(0, recordsPerPage));
+
+    return () => {
+      tableContainer.current.removeEventListener("scroll", handler);
+    }
   }, []);
   
   /**
@@ -102,7 +106,7 @@ function App() {
       <button onClick={onClickLeft}>Up</button>
       <button onClick={onClickRight}>Down</button>
       <div ref={tableContainer} className='App-Inner'>
-      <div ref={startBuffer}/>
+      <div className="animated-gradient" ref={startBuffer}/>
       <table id="tid">
         <tbody>
         {
@@ -119,7 +123,7 @@ function App() {
         }
         </tbody>
       </table> 
-      <div ref={endBuffer}/>
+      <div className="animated-gradient" ref={endBuffer}/>
       </div>
     </div>
   );
