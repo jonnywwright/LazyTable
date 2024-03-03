@@ -27,7 +27,6 @@ function App() {
   const startBuffer = useRef(null);
   const endBuffer = useRef(null);
   const [windowLeft, setWindowLeft] = useState(0);
-  const [windowRight, setWindowRight] = useState(recordsPerPage);
 
   // Where the dom manipulation happens.
   useEffect(() => {
@@ -49,25 +48,23 @@ function App() {
     }
 
     const updateWindowLeft = windowLeft - incrementSize;
-    const updateWindowRight = windowRight - incrementSize;
 
     setWindowLeft(updateWindowLeft);
-    setWindowRight(updateWindowRight);
-    setData(allData.current.slice(updateWindowLeft, updateWindowRight));
+    const right = updateWindowLeft + recordsPerPage;
+    setData(allData.current.slice(updateWindowLeft, right));
   }
 
   // Used for debugging;
   const onClickRight = () => {
-    if (windowRight === totalRecords) {
+    if (windowLeft + recordsPerPage === totalRecords) {
       return;
     }
 
     const updateWindowLeft = windowLeft + incrementSize;
-    const updateWindowRight = windowRight + incrementSize;
+    const right = updateWindowLeft + recordsPerPage; 
 
     setWindowLeft(updateWindowLeft);
-    setWindowRight(updateWindowRight);
-    setData(allData.current.slice(0, windowRight));
+    setData(allData.current.slice(updateWindowLeft, right));
   } 
 
   // Load the scroll handler and set the initial data.
@@ -77,17 +74,14 @@ function App() {
       const left = Math.round(scrollTop/rowHeight);
       
       // set the correct data
-      const right = left + recordsPerPage;
-      
       setWindowLeft(left);
-      setWindowRight(right);
-      setData(allData.current.slice(left, right));
+      setData(allData.current.slice(left, left + recordsPerPage));
     }
 
     tableContainer.current.addEventListener("scrollend", handler);
 
     // Set the initial data.
-    setData(allData.current.slice(0, windowRight));
+    setData(allData.current.slice(0, recordsPerPage));
   }, []);
   
   /**
