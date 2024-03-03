@@ -1,12 +1,11 @@
 import './App.css';
 import { useEffect, useState, useRef } from "react";
 
-const totalRecords = 500000;
+const totalRecords = 5000;
 const mockData = () => Array.from(Array(totalRecords).keys()).map(x => ({
   a: x, b: "alsdfjasldf", c: "asldfjsdfjk"
 }));
 
-// size of each table row
 const rowHeight = 20;
 
 // size of the visible portion of the table
@@ -24,10 +23,6 @@ const incrementBufferSize = rowHeight * incrementSize;
 const initialEndBufferSize = (totalRecords * rowHeight) - pageSize;
 
 const getSizeFromPixel = (str) => Number(str.substring(0, str.length - 2));
-
-/**
- * Scroll top to window
- */
 
 function App() {
   const [data, setData] = useState([]);
@@ -141,8 +136,8 @@ function App() {
 
   return (
     <div className="App">
-      <button onClick={onClickLeft}>Left</button>
-      <button onClick={onClickRight}>Right</button>
+      <button onClick={onClickLeft}>Up</button>
+      <button onClick={onClickRight}>Down</button>
       <div className='App-Inner' id="super-special-id">
       <div ref={startBuffer}/>
       <table id="tid">

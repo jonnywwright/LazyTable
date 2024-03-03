@@ -1,8 +1,17 @@
 .App {
   position: absolute;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 }
 body {
   background: #001d66;
+}
+
+button {
+  width: 200px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 table {
@@ -27,4 +36,6 @@ tbody, table, tr, td {
   overflow: auto;
   height: 1000px;
   background: #d4d4d4;
+  margin-left: auto;
+  margin-right: auto;
 }
