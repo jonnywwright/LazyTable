@@ -3,7 +3,7 @@ import { useEffect, useState, useRef } from "react";
 
 const totalRecords = 5000;
 const mockData = () => Array.from(Array(totalRecords).keys()).map(x => ({
-  a: x, b: "alsdfjasldf", c: "asldfjsdfjk"
+  a: x, b: "Jonny", c: "Wright", d: "Forcura", e: "Jacksonville, Fl"
 }));
 
 const rowHeight = 20;
@@ -17,38 +17,32 @@ const recordsPerPage = pageSize / rowHeight;
 // number of row to increment on next page
 const incrementSize = 1;
 
-// amount to grow or shrink buffers 
-const incrementBufferSize = rowHeight * incrementSize; 
-
 const initialEndBufferSize = (totalRecords * rowHeight) - pageSize;
-
-const getSizeFromPixel = (str) => Number(str.substring(0, str.length - 2));
 
 function App() {
   const [data, setData] = useState([]);
   const [checkedIds, setCheckedIds] = useState([]);
   const allData = useRef(mockData().map(x => x));
+  const tableContainer = useRef(null);
   const startBuffer = useRef(null);
   const endBuffer = useRef(null);
-
   const [windowLeft, setWindowLeft] = useState(0);
-  const [windowRight, setWindowRight] = useState(50);
+  const [windowRight, setWindowRight] = useState(recordsPerPage);
 
-  const incrementBuffer = (ref, count) => {
-    const pixelHeight = ref.current.style.height;
-    
-    console.log({pixelHeight})
-    let height = getSizeFromPixel(pixelHeight);
+  // Where the dom manipulation happens.
+  useEffect(() => {
+    const fBufferHeight = windowLeft * rowHeight;
 
-    height += count;
+    startBuffer.current.style.height = `${fBufferHeight}px`;
 
-    ref.current.style.height = `${height}px`;
-  }
+    const eBufferHeight = initialEndBufferSize - fBufferHeight;
 
-  const scrollTableIntoView = () => {
+    endBuffer.current.style.height = `${eBufferHeight}px`
+
     document.getElementById("tid").scrollIntoView();
-  }
+  }, [windowLeft])
 
+  // Used for debugging;
   const onClickLeft = () => {
     if (windowLeft === 0) {
       return;
@@ -59,14 +53,10 @@ function App() {
 
     setWindowLeft(updateWindowLeft);
     setWindowRight(updateWindowRight);
-
     setData(allData.current.slice(updateWindowLeft, updateWindowRight));
-
-    incrementBuffer(startBuffer, -incrementBufferSize);
-    incrementBuffer(endBuffer, incrementBufferSize);
-
-    scrollTableIntoView();
   }
+
+  // Used for debugging;
   const onClickRight = () => {
     if (windowRight === totalRecords) {
       return;
@@ -77,57 +67,34 @@ function App() {
 
     setWindowLeft(updateWindowLeft);
     setWindowRight(updateWindowRight);
-
-    setData(allData.current.slice(updateWindowLeft, updateWindowRight));
-
-    incrementBuffer(startBuffer, incrementBufferSize);
-    incrementBuffer(endBuffer, -incrementBufferSize);
-
-    scrollTableIntoView();
-  }
-
-  useEffect(() => {
     setData(allData.current.slice(0, windowRight));
-    // set initial buffer heights
-    startBuffer.current.style.height = "0px";
-    endBuffer.current.style.height = `${initialEndBufferSize}px`;
-  }, []);
+  } 
 
+  // Load the scroll handler and set the initial data.
   useEffect(() => {
-    const container = document.getElementById("super-special-id");
-
-    const handler = (event) => {
-      const st = container.scrollTop;
-      const c = Math.round(st/rowHeight);
-      // print scroll top
-      console.log(container.scrollTop, { c });
+    const handler = () => {
+      const scrollTop = tableContainer.current.scrollTop;
+      const left = Math.round(scrollTop/rowHeight);
       
       // set the correct data
-      const l = c;
-      const r = c + recordsPerPage;
+      const right = left + recordsPerPage;
       
-      setWindowLeft(l);
-      setWindowRight(r);
-      setData(allData.current.slice(l, r));
-
-      // get the frontBuffer height and set it
-      const fBufferHeight = c * rowHeight;
-
-      startBuffer.current.style.height = `${fBufferHeight}px`;
-
-      const eBufferHeight = initialEndBufferSize - fBufferHeight;
-
-      endBuffer.current.style.height = `${eBufferHeight}px`
-
-      // get the back buffer height and set it
-
-      // scroll into view
-     scrollTableIntoView();
+      setWindowLeft(left);
+      setWindowRight(right);
+      setData(allData.current.slice(left, right));
     }
 
-    container.addEventListener("scrollend", handler);
+    tableContainer.current.addEventListener("scrollend", handler);
+
+    // Set the initial data.
+    setData(allData.current.slice(0, windowRight));
   }, []);
   
+  /**
+   * 
+   * Box checking should feel instant. This is a good test to
+   * ensure the rendered row count isn't to high.
+   */
   const onChecked = (id) => {
     if (checkedIds.includes(id)) {
       setCheckedIds(prev => prev.filter(x => x !== id));
@@ -140,17 +107,19 @@ function App() {
     <div className="App">
       <button onClick={onClickLeft}>Up</button>
       <button onClick={onClickRight}>Down</button>
-      <div className='App-Inner' id="super-special-id">
+      <div ref={tableContainer} className='App-Inner'>
       <div ref={startBuffer}/>
       <table id="tid">
         <tbody>
         {
-          data.map(({a, b, c}) => 
+          data.map(({a, b, c, d, e}) => 
             <tr key={a.toString()}>
-              <td><input type="checkbox" checked={checkedIds.includes(a)} onClick={() => onChecked(a)}/></td>
+              <td><input type="checkbox" checked={checkedIds.includes(a)} onChange={() => onChecked(a)}/></td>
               <td>{a}</td>
               <td>{b}</td>
               <td>{c}</td>
+              <td>{d}</td>
+              <td>{e}</td>
             </tr>
           )
         }
