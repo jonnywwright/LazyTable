@@ -10,8 +10,8 @@ const App = () => {
   
   const getDataAsync = async (idx, size) => {
     // Simulate a 300ms response time.
-    await new Promise(resolve => setTimeout(resolve, 300));
-  
+    await new Promise(resolve => setTimeout(resolve, 500));
+
     return mockData.slice(idx, size);
   }
 

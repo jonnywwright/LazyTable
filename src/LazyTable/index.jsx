@@ -3,14 +3,12 @@ import "./index.css";
 
 const incrementSize = 1;
 
-
 /**
  * **************Load behavior for scrolling*********************
  * Table should handle fetching. As we scroll into unfilled space
  * we should fetch to fill up our data reference. While waiting for
  * data we can block scrolling. Think lazy loading.
  */
-
 const LazyTable = ({getDataAsync, 
     fetchSize, 
     tableHeight, 
@@ -32,7 +30,7 @@ const LazyTable = ({getDataAsync,
    * probably fine. Eventually I need to support deleting and possibly
    * updating as well.
    */
-  const allData = useRef(mockData.map(x => x));
+  const allData = useRef(new Array(totalRecords));
  
   // Where the dom manipulation happens.
   useEffect(() => {
@@ -78,13 +76,37 @@ const LazyTable = ({getDataAsync,
 
   // Load the scroll handler and set the initial data.
   useEffect(() => {
-    const handler = () => {
+
+    // Scrolling down is solved.
+    // TODO: Scrolling up
+    // TODO: Point scrolling
+    // TODO: Add lock so only one hander per segment.
+    const handler = async () => {
+      console.log('here')
       const scrollTop = tableContainer.current.scrollTop;
       const left = Math.round(scrollTop/rowHeight);
-      
-      // set the correct data
+      const right = left + recordsPerPage;
+
+      // Found segment without data.
+      if (allData.current[right] === undefined) {
+        const batchCount = Math.floor((right + fetchSize) / fetchSize) -1;
+
+        const fetchLeft = batchCount * fetchSize;
+        
+        const fetchRight = fetchLeft + fetchSize;
+
+        const missingBatch = await getDataAsync(fetchLeft, fetchRight);
+
+        let missingBatchIdx = 0;
+
+        for (let i = fetchLeft; i < fetchRight; i++) {
+          allData.current[i] = missingBatch[missingBatchIdx];
+          missingBatchIdx++;
+        }
+      }
+
       setWindowLeft(left);
-      setData(allData.current.slice(left, left + recordsPerPage));
+      setData(allData.current.slice(left, right));
     }
 
     tableContainer.current.style.height = `${tableHeight}px`;
@@ -92,7 +114,6 @@ const LazyTable = ({getDataAsync,
     tableContainer.current.addEventListener("scroll", handler);
 
     // Set the initial data.
-
     const setInitialDataAsync = async () => {
       const idxStart = 0;
       
@@ -103,13 +124,13 @@ const LazyTable = ({getDataAsync,
       for (let i = idxStart; i < fetchSize; i++) {
         allData.current[i] = initialData[i];
       }
-      
+
       // Write to data
       setData(allData.current.slice(idxStart, fetchSize)); 
     }
 
     setInitialDataAsync();
-    
+
     // Cleanup listeners.
     return () => {
       tableContainer.current.removeEventListener("scroll", handler);
@@ -117,7 +138,6 @@ const LazyTable = ({getDataAsync,
   }, []);
   
   /**
-   * 
    * Box checking should feel instant. This is a good test to
    * ensure the rendered row count isn't to high.
    */
