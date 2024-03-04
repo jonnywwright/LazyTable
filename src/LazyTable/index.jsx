@@ -22,12 +22,18 @@ const LazyTable = ({getDataAsync,
 
   const [data, setData] = useState([]);
   const [checkedIds, setCheckedIds] = useState([]);
-  const allData = useRef(mockData.map(x => x));
   const tableContainer = useRef(null);
   const startBuffer = useRef(null);
   const endBuffer = useRef(null);
   const [windowLeft, setWindowLeft] = useState(0);
   
+  /**
+   * This is a cache. Right now it's going to be size n records. That's
+   * probably fine. Eventually I need to support deleting and possibly
+   * updating as well.
+   */
+  const allData = useRef(mockData.map(x => x));
+ 
   // Where the dom manipulation happens.
   useEffect(() => {
     const fBufferHeight = windowLeft * rowHeight;
@@ -86,8 +92,24 @@ const LazyTable = ({getDataAsync,
     tableContainer.current.addEventListener("scroll", handler);
 
     // Set the initial data.
-    setData(allData.current.slice(0, recordsPerPage));
 
+    const setInitialDataAsync = async () => {
+      const idxStart = 0;
+      
+      // TODO:// Make clear that fetch size should never change.
+      const initialData = await getDataAsync(idxStart, fetchSize);
+
+      // Write to cache.
+      for (let i = idxStart; i < fetchSize; i++) {
+        allData.current[i] = initialData[i];
+      }
+      
+      // Write to data
+      setData(allData.current.slice(idxStart, fetchSize)); 
+    }
+
+    setInitialDataAsync();
+    
     // Cleanup listeners.
     return () => {
       tableContainer.current.removeEventListener("scroll", handler);
