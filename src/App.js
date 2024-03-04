@@ -8,9 +8,6 @@ const App = () => {
     a: x, b: "Jonny", c: "Wright", d: "Forcura", e: "Jacksonville, Fl"
   }));
   
-  /**
-   * 
-   */
   const getDataAsync = async (idx, size) => {
     // Simulate a 300ms response time.
     await new Promise(resolve => setTimeout(resolve, 300));
