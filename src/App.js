@@ -1,130 +1,33 @@
 import './App.css';
-import { useEffect, useState, useRef } from "react";
+import VirtualTable from './VirtualTable';
 
-const totalRecords = 5000;
-const mockData = () => Array.from(Array(totalRecords).keys()).map(x => ({
-  a: x, b: "Jonny", c: "Wright", d: "Forcura", e: "Jacksonville, Fl"
-}));
+const App = () => {
+  const totalRecords = 5000;
 
-const rowHeight = 20;
-
-// size of the visible portion of the table
-const pageSize = 1000;
-
-// records per page
-const recordsPerPage = pageSize / rowHeight;
-
-// number of row to increment on next page
-const incrementSize = 1;
-
-const initialEndBufferSize = (totalRecords * rowHeight) - pageSize;
-
-function App() {
-  const [data, setData] = useState([]);
-  const [checkedIds, setCheckedIds] = useState([]);
-  const allData = useRef(mockData().map(x => x));
-  const tableContainer = useRef(null);
-  const startBuffer = useRef(null);
-  const endBuffer = useRef(null);
-  const [windowLeft, setWindowLeft] = useState(0);
-
-  // Where the dom manipulation happens.
-  useEffect(() => {
-    const fBufferHeight = windowLeft * rowHeight;
-
-    startBuffer.current.style.height = `${fBufferHeight}px`;
-
-    const eBufferHeight = initialEndBufferSize - fBufferHeight;
-
-    endBuffer.current.style.height = `${eBufferHeight}px`
-  }, [windowLeft])
-
-  // Used for debugging;
-  const onClickLeft = () => {
-    if (windowLeft === 0) {
-      return;
-    }
-
-    const updateWindowLeft = windowLeft - incrementSize;
-
-    setWindowLeft(updateWindowLeft);
-    const right = updateWindowLeft + recordsPerPage;
-    setData(allData.current.slice(updateWindowLeft, right));
-  }
-
-  // Used for debugging;
-  const onClickRight = () => {
-    if (windowLeft + recordsPerPage === totalRecords) {
-      return;
-    }
-
-    const updateWindowLeft = windowLeft + incrementSize;
-    const right = updateWindowLeft + recordsPerPage; 
-
-    setWindowLeft(updateWindowLeft);
-    setData(allData.current.slice(updateWindowLeft, right));
-  } 
-
-  // Load the scroll handler and set the initial data.
-  useEffect(() => {
-    const handler = () => {
-      const scrollTop = tableContainer.current.scrollTop;
-      const left = Math.round(scrollTop/rowHeight);
-      
-      // set the correct data
-      setWindowLeft(left);
-      setData(allData.current.slice(left, left + recordsPerPage));
-    }
-
-    tableContainer.current.style.height = `${pageSize}px`;
-
-    tableContainer.current.addEventListener("scroll", handler);
-
-    // Set the initial data.
-    setData(allData.current.slice(0, recordsPerPage));
-
-    return () => {
-      tableContainer.current.removeEventListener("scroll", handler);
-    }
-  }, []);
+  const mockData = Array.from(Array(totalRecords).keys()).map(x => ({
+    a: x, b: "Jonny", c: "Wright", d: "Forcura", e: "Jacksonville, Fl"
+  }));
   
   /**
    * 
-   * Box checking should feel instant. This is a good test to
-   * ensure the rendered row count isn't to high.
    */
-  const onChecked = (id) => {
-    if (checkedIds.includes(id)) {
-      setCheckedIds(prev => prev.filter(x => x !== id));
-    } else {
-      setCheckedIds(prev => [...prev, id]);
-    }
+  const getDataAsync = async (idx, size) => {
+    // Simulate a 300ms response time.
+    await new Promise(resolve => setTimeout(resolve, 300));
+  
+    return mockData.slice(idx, size);
   }
 
   return (
     <div className="App">
-      <button onClick={onClickLeft}>Up</button>
-      <button onClick={onClickRight}>Down</button>
-      <div ref={tableContainer} className='App-Inner'>
-      <div className="animated-gradient" ref={startBuffer}/>
-      <table id="tid">
-        <tbody>
-        {
-          data.map(({a, b, c, d, e}) => 
-            <tr key={a.toString()}>
-              <td><input type="checkbox" checked={checkedIds.includes(a)} onChange={() => onChecked(a)}/></td>
-              <td>{a}</td>
-              <td>{b}</td>
-              <td>{c}</td>
-              <td>{d}</td>
-              <td>{e}</td>
-            </tr>
-          )
-        }
-        </tbody>
-      </table> 
-      <div className="animated-gradient" ref={endBuffer}/>
-      </div>
+     <VirtualTable 
+      getDataAsync={getDataAsync} 
+      fetchSize={50}
+      tableHeight={1000}
+      rowHeight={20}
+      totalRecords={5000}
+      mockData={mockData}
+     /> 
     </div>
   );
 }
