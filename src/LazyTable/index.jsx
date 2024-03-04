@@ -27,7 +27,7 @@ const LazyTable = ({getDataAsync,
   const startBuffer = useRef(null);
   const endBuffer = useRef(null);
   const [windowLeft, setWindowLeft] = useState(0);
-
+  
   // Where the dom manipulation happens.
   useEffect(() => {
     const fBufferHeight = windowLeft * rowHeight;
@@ -39,7 +39,7 @@ const LazyTable = ({getDataAsync,
     endBuffer.current.style.height = `${eBufferHeight}px`
   }, [windowLeft])
 
-  // Used for debugging;
+  // DEBUG:
   const onClickLeft = () => {
     if (windowLeft === 0) {
       return;
@@ -52,7 +52,7 @@ const LazyTable = ({getDataAsync,
     setData(allData.current.slice(updateWindowLeft, right));
   }
 
-  // Used for debugging;
+  // DEBUG: 
   const onClickRight = () => {
     if (windowLeft + recordsPerPage === totalRecords) {
       return;
@@ -63,7 +63,12 @@ const LazyTable = ({getDataAsync,
 
     setWindowLeft(updateWindowLeft);
     setData(allData.current.slice(updateWindowLeft, right));
-  } 
+  }
+  
+  // DEBUG:
+  useEffect(() => {
+    console.log('DEBUG', { windowLeft }, { data });
+  }, [windowLeft, data])
 
   // Load the scroll handler and set the initial data.
   useEffect(() => {
