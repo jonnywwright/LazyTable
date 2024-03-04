@@ -3,6 +3,14 @@ import "./index.css";
 
 const incrementSize = 1;
 
+
+/**
+ * **************Load behavior for scrolling*********************
+ * Table should handle fetching. As we scroll into unfilled space
+ * we should fetch to fill up our data reference. While waiting for
+ * data we can block scrolling. Think lazy loading.
+ */
+
 const VirtualTable = ({getDataAsync, 
     fetchSize, 
     tableHeight, 
