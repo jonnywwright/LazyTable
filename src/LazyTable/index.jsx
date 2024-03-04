@@ -6,8 +6,8 @@ const incrementSize = 1;
 /**
  * **************Load behavior for scrolling*********************
  * Table should handle fetching. As we scroll into unfilled space
- * we should fetch to fill up our data reference. While waiting for
- * data we can block scrolling. Think lazy loading.
+ * we should fetch to fill up our data reference. We shouldn't 
+ * block scrolling that's annoying.
  */
 const LazyTable = ({getDataAsync, 
     fetchSize, 
