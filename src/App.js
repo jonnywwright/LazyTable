@@ -1,5 +1,5 @@
 import './App.css';
-import VirtualTable from './VirtualTable';
+import LazyTable from './LazyTable';
 
 const App = () => {
   const totalRecords = 5000;
@@ -17,7 +17,7 @@ const App = () => {
 
   return (
     <div className="App">
-     <VirtualTable 
+     <LazyTable
       getDataAsync={getDataAsync} 
       fetchSize={50}
       tableHeight={1000}
