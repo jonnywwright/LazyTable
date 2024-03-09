@@ -1,6 +1,25 @@
 import { useEffect, useState, useRef } from "react";
 import "./index.css";
 
+
+/**
+ * **************Idea for paging system.***********************
+ * To fix issue with div buffers appearing during scroll we can
+ * increase the page size and divide it up into 3 sections. 
+ * This way when scrolling the buffers shouldn't bleed into view.
+ * The arrow below shows which section is visible and how new 
+ * sections get loaded in. Always keep a section above and below
+ * current position. This should also solve point scroll.
+  a b c
+  ^
+    ^
+      ^
+    b c d
+        ^
+      c d e    
+ */
+
+
 const incrementSize = 1;
 
 /**
