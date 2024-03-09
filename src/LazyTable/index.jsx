@@ -9,7 +9,10 @@ import "./index.css";
  * This way when scrolling the buffers shouldn't bleed into view.
  * The arrow below shows which section is visible and how new 
  * sections get loaded in. Always keep a section above and below
- * current position. This should also solve point scroll.
+ * current position. This should also solve point scroll. We should
+ * also be able to signal cancels on loads happening outside of 
+ * the sections. This should improve performance and prevent
+ * a lot of unnecessary calls during fast scrolls.
   a b c
   ^
     ^
@@ -18,7 +21,6 @@ import "./index.css";
         ^
       c d e    
  */
-
 
 const incrementSize = 1;
 
