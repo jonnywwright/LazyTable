@@ -13,8 +13,7 @@ const LazyTable = ({getDataAsync,
     fetchSize, 
     tableHeight, 
     rowHeight, 
-    totalRecords,
-    mockData}) => {
+    totalRecords}) => {
   const initialEndBufferSize = (totalRecords * rowHeight) - tableHeight;
   const recordsPerPage = tableHeight / rowHeight;
 
@@ -31,7 +30,13 @@ const LazyTable = ({getDataAsync,
    * updating as well.
    */
   const allData = useRef(new Array(totalRecords));
- 
+
+  /**
+   * We write data in segments as we scroll. Use promises to block setData
+   * while writing to the cache.
+   */
+  const loadingPromisesLookup = useRef({});
+  
   // Where the dom manipulation happens.
   useEffect(() => {
     const fBufferHeight = windowLeft * rowHeight;
@@ -41,7 +46,7 @@ const LazyTable = ({getDataAsync,
     const eBufferHeight = initialEndBufferSize - fBufferHeight;
 
     endBuffer.current.style.height = `${eBufferHeight}px`
-  }, [windowLeft])
+  }, [windowLeft]);
 
   // DEBUG:
   const onClickLeft = () => {
@@ -82,7 +87,6 @@ const LazyTable = ({getDataAsync,
     // TODO: Point scrolling
     // TODO: Add lock so only one hander per segment.
     const handler = async () => {
-      console.log('here')
       const scrollTop = tableContainer.current.scrollTop;
       const left = Math.round(scrollTop/rowHeight);
       const right = left + recordsPerPage;
@@ -91,18 +95,31 @@ const LazyTable = ({getDataAsync,
       if (allData.current[right] === undefined) {
         const batchCount = Math.floor((right + fetchSize) / fetchSize) -1;
 
-        const fetchLeft = batchCount * fetchSize;
-        
-        const fetchRight = fetchLeft + fetchSize;
+        if (loadingPromisesLookup[batchCount] === undefined)
+        {
+          let batchLoadingResolver;
 
-        const missingBatch = await getDataAsync(fetchLeft, fetchRight);
+          loadingPromisesLookup[batchCount] = new Promise(resolver => {
+            batchLoadingResolver = resolver;
+          });
 
-        let missingBatchIdx = 0;
+          const fetchLeft = batchCount * fetchSize;
+          
+          const fetchRight = fetchLeft + fetchSize;
 
-        for (let i = fetchLeft; i < fetchRight; i++) {
-          allData.current[i] = missingBatch[missingBatchIdx];
-          missingBatchIdx++;
-        }
+          const missingBatch = await getDataAsync(fetchLeft, fetchRight);
+
+          let missingBatchIdx = 0;
+
+          for (let i = fetchLeft; i < fetchRight; i++) {
+            allData.current[i] = missingBatch[missingBatchIdx];
+            missingBatchIdx++;
+          }
+
+          batchLoadingResolver();
+        } else {
+          await loadingPromisesLookup[batchCount];
+        }       
       }
 
       setWindowLeft(left);
