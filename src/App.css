@@ -1,5 +1,4 @@
 .App {
-  position: absolute;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -7,4 +6,30 @@
 
 body {
   background: #001d66;
+}
+
+.action-table {
+  margin-top: 48px;
+  display: flex;
+  flex-wrap: wrap;
+  background-color: dodgerblue;
+}
+
+.action-table > div {
+  width: 40px;
+  margin: 10px;
+  text-align: center;
+  font-size: 20px;
+}
+
+.fetching {
+  background-color: yellow;
+}
+
+.cancelling {
+  background-color: red;
+}
+
+.loaded {
+  background-color: green;
 }

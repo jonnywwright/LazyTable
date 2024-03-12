@@ -128,7 +128,7 @@ const LazyTable = ({getDataAsync,
           
           const fetchRight = fetchLeft + fetchSize;
 
-          const missingBatch = await getDataAsync(fetchLeft, fetchRight);
+          const missingBatch = await getDataAsync(fetchLeft, fetchRight, batchCount);
 
           let missingBatchIdx = 0;
 
@@ -156,7 +156,7 @@ const LazyTable = ({getDataAsync,
       const idxStart = 0;
       
       // TODO:// Make clear that fetch size should never change.
-      const initialData = await getDataAsync(idxStart, fetchSize);
+      const initialData = await getDataAsync(idxStart, fetchSize, 0);
 
       // Write to cache.
       for (let i = idxStart; i < fetchSize; i++) {
