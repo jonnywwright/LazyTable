@@ -15,8 +15,6 @@ const initialCacheArray = Array.from(new Array((totalRecords/fetchSize))).map((x
 const App = () => {  
   const [blockStates, setBlockStates] = useState(initialCacheArray);
 
-  console.log(blockStates)
-
   const mockData = Array.from(Array(totalRecords).keys()).map(x => ({
     a: x, b: "Jonny", c: "Wright", d: "Forcura", e: "Jacksonville, Fl"
   }));
@@ -39,6 +37,7 @@ const App = () => {
       // Paint blocks green.
       setBlockStatesHandler(blockIdx, "loaded");
     } catch(ex) {
+      // TODO: Add cancellation token to allow fetch cancelling.
       // Paint blocks red.
       setBlockStatesHandler(blockIdx, "cancelled");
     }
@@ -60,7 +59,7 @@ const App = () => {
     </div>
     <div className="action-table">
       {
-        blockStates.map((x) => <div className={x.blockState}>{x.blockId}</div>)
+        blockStates.map((x) => <div key={`block-key-${x.blockId}`} className={x.blockState}>{x.blockId}</div>)
       }
     </div>
   </> 

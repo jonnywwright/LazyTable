@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import "./index.css";
 
-
 /**
  * **************Idea for paging system.***********************
  * To fix issue with div buffers appearing during scroll we can
@@ -22,7 +21,6 @@ import "./index.css";
       c d e    
  */
 
-const incrementSize = 1;
 
 /**
  * **************Load behavior for scrolling*********************
@@ -69,33 +67,7 @@ const LazyTable = ({getDataAsync,
     endBuffer.current.style.height = `${eBufferHeight}px`
   }, [windowLeft]);
 
-  // DEBUG:
-  const onClickLeft = () => {
-    if (windowLeft === 0) {
-      return;
-    }
-
-    const updateWindowLeft = windowLeft - incrementSize;
-
-    setWindowLeft(updateWindowLeft);
-    const right = updateWindowLeft + recordsPerPage;
-    setData(allData.current.slice(updateWindowLeft, right));
-  }
-
-  // DEBUG: 
-  const onClickRight = () => {
-    if (windowLeft + recordsPerPage === totalRecords) {
-      return;
-    }
-
-    const updateWindowLeft = windowLeft + incrementSize;
-    const right = updateWindowLeft + recordsPerPage; 
-
-    setWindowLeft(updateWindowLeft);
-    setData(allData.current.slice(updateWindowLeft, right));
-  }
-  
-  // DEBUG:
+    // DEBUG:
   useEffect(() => {
     console.log('DEBUG', { windowLeft }, { data });
   }, [windowLeft, data])
@@ -116,11 +88,11 @@ const LazyTable = ({getDataAsync,
       if (allData.current[right] === undefined) {
         const batchCount = Math.floor((right + fetchSize) / fetchSize) -1;
 
-        if (loadingPromisesLookup[batchCount] === undefined)
+        if (loadingPromisesLookup.current[batchCount] === undefined)
         {
           let batchLoadingResolver;
 
-          loadingPromisesLookup[batchCount] = new Promise(resolver => {
+          loadingPromisesLookup.current[batchCount] = new Promise(resolver => {
             batchLoadingResolver = resolver;
           });
 
@@ -139,7 +111,7 @@ const LazyTable = ({getDataAsync,
 
           batchLoadingResolver();
         } else {
-          await loadingPromisesLookup[batchCount];
+          await loadingPromisesLookup.current[batchCount];
         }       
       }
 
@@ -189,8 +161,6 @@ const LazyTable = ({getDataAsync,
 
   return (
     <>
-      <button onClick={onClickLeft}>Up</button>
-      <button onClick={onClickRight}>Down</button>
       <div ref={tableContainer} className='App-Inner'>
       <div className="animated-gradient" ref={startBuffer}/>
       <table id="tid">
