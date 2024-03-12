@@ -1,36 +1,34 @@
-
 button {
-    width: 200px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  
-  table {
-    border-collapse: collapse;
-  }
-  
-  tbody, table, tr, td {
-    margin: 0px;
-    padding: 0px;
-    font-size: 14px;
-    box-sizing: border-box;
-  
-   }
-  
-   td {
-    background-color: #adc6ff;
-    padding-left: 24px;
-    padding-right: 24px;
-    margin: 0px;
-   }
-   
-  .App-Inner {
-    overflow: auto;
-    background: #d4d4d4;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  
+  width: 200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+tbody, table, tr, td {
+  margin: 0px;
+  padding: 0px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+td {
+  background-color: #adc6ff;
+  padding-left: 24px;
+  padding-right: 24px;
+  margin: 0px;
+}
+
+.App-Inner {
+  overflow: auto;
+  background: #d4d4d4;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .buffer {
   background-color: #adc6ff;
 } 
