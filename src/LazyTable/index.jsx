@@ -162,7 +162,7 @@ const LazyTable = ({getDataAsync,
   return (
     <>
       <div ref={tableContainer} className='App-Inner'>
-      <div className="animated-gradient" ref={startBuffer}/>
+      <div className="buffer" ref={startBuffer}/>
       <table id="tid">
         <tbody>
         {
@@ -179,7 +179,7 @@ const LazyTable = ({getDataAsync,
         }
         </tbody>
       </table> 
-      <div className="animated-gradient" ref={endBuffer}/>
+      <div className="buffer" ref={endBuffer}/>
       </div>
     </>
   );
